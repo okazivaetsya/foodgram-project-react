@@ -4,30 +4,30 @@ from .models import Recipe, Ingredients, IngredientsAmount, Tag
 
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'title',
+        'name',
         'author',
-        'picture',
-        'description',
+        'image',
+        'text',
         'cooking_time',
         'pub_date',)
-    search_fields = ('description', 'title',)
+    search_fields = ('text', 'name',)
     list_filter = ('author',)
     empty_value_display = '-пусто-'
 
 
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = (
-        'title',
-        'unit',
+        'name',
+        'measurement_unit',
        )
-    search_fields = ('title',)
-    list_filter = ('unit',)
+    search_fields = ('name',)
+    list_filter = ('measurement_unit',)
     empty_value_display = '-пусто-'
 
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'title',
+        'name',
         'color',
         'slug',
     )

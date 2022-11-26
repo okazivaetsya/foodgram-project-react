@@ -7,27 +7,27 @@ User = get_user_model()
 
 class Tag(models.Model):
     """Модель для тегов"""
-    title = models.CharField(null=False, max_length=200)
-    color = models.CharField(null=False, max_length=200)
+    name = models.CharField(null=False, max_length=200)
+    color = models.CharField(null=False, max_length=7)
     slug = models.SlugField(null=False, max_length=200)
 
     class Meta:
-        ordering = ('title', )
+        ordering = ('name', )
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Ingredients(models.Model):
     """Модель для ингридиентов"""
-    title = models.CharField(max_length=200)
-    unit = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+    measurement_unit = models.CharField(max_length=200)
 
     class Meta:
-        ordering = ('title', )
+        ordering = ('name', )
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Recipe(models.Model):
@@ -39,13 +39,13 @@ class Recipe(models.Model):
         verbose_name='author'
     )
 
-    title = models.CharField(max_length=200)
-    picture = models.ImageField(
+    name = models.CharField(max_length=200)
+    image = models.ImageField(
         upload_to='recipe/images/',
         null=True,
         default=None
         )
-    description = models.TextField()
+    text = models.TextField()
     ingredients = models.ManyToManyField(
         'Ingredients',
         related_name='recipe',
