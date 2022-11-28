@@ -41,7 +41,7 @@ class Recipe(models.Model):
 
     name = models.CharField(max_length=200)
     image = models.ImageField(
-        upload_to='recipe/images/',
+        upload_to='recipes/images/',
         null=True,
         default=None
         )
@@ -67,7 +67,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date', )
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class IngredientsAmount(models.Model):
