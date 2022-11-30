@@ -1,22 +1,23 @@
 from rest_framework import serializers
-from recipes.models import Recipe, Tag, User, IngredientsAmount
+from recipes.models import Recipe, Tag, User, IngredientsAmount, Ingredients
 
 
 class TagSerializer(serializers.ModelSerializer):
-
+    """Сериализатор для Тегов"""
     class Meta:
         model = Tag
-        fields = ('name', 'color', 'slug')
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    """Сериализатор для модели пользователя"""
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name')
 
 
-class IngredientSerializer(serializers.ModelSerializer):
+class IngredientInRecipesSerializer(serializers.ModelSerializer):
+    """Сериализатор для показа ингредиентов в рецепте"""
     id = serializers.ReadOnlyField(source="ingredient.id")
     name = serializers.ReadOnlyField(source="ingredient.name")
     measurement_unit = serializers.ReadOnlyField(
@@ -27,11 +28,21 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
+class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор для ингредиентов"""
+    class Meta:
+        model = Ingredients
+        fields = ('id', 'name', 'measurement_unit')
+
+
 class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для рецептов"""
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientSerializer(source='ingredients_amount', many=True)
-    is_favorite = serializers.SerializerMethodField()
+    ingredients = IngredientInRecipesSerializer(
+        source='ingredients_amount',
+        many=True
+    )
 
     class Meta:
         model = Recipe
@@ -40,7 +51,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            'is_favorite',
             'name',
             'image',
             'text',

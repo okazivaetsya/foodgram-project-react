@@ -69,6 +69,7 @@ class Recipe(models.Model):
     )
     favorite = models.ManyToManyField(
         User,
+        verbose_name='Любимые рецепты',
         related_name='favorites'
     )
     tags = models.ManyToManyField(
