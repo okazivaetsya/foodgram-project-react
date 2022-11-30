@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from recipes.models import Recipe, Tag, User, IngredientsAmount, Ingredients
+from recipes.models import Recipe, Tag, IngredientsAmount, Ingredients
+from users.models import FoodgramUser, Follow
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -11,9 +12,16 @@ class TagSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для модели пользователя"""
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
     class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+        model = FoodgramUser
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return (request and not request.user.is_anonymous
+                and Follow.objects.filter(user=self.context['request'].user,
+                                          author=obj).exists())
 
 
 class IngredientInRecipesSerializer(serializers.ModelSerializer):

@@ -1,8 +1,6 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
-
-User = get_user_model()
+from users.models import FoodgramUser
 
 
 class Tag(models.Model):
@@ -43,7 +41,7 @@ class Ingredients(models.Model):
 class Recipe(models.Model):
     """Модель для рецептов"""
     author = models.ForeignKey(
-        User,
+        FoodgramUser,
         on_delete=models.CASCADE,
         related_name='recipe',
         verbose_name='Автор'
@@ -68,7 +66,7 @@ class Recipe(models.Model):
         through='IngredientsAmount'
     )
     favorite = models.ManyToManyField(
-        User,
+        FoodgramUser,
         verbose_name='Любимые рецепты',
         related_name='favorites'
     )

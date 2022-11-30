@@ -31,7 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'recipes.apps.RecipesConfig',
+    'recipes',
+    'users',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -105,6 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.FoodgramUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
