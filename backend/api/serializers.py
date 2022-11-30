@@ -31,6 +31,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientSerializer(source='ingredients_amount', many=True)
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -39,6 +40,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
+            'is_favorite',
             'name',
             'image',
             'text',
