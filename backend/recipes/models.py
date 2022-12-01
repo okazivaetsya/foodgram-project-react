@@ -70,7 +70,8 @@ class Recipe(models.Model):
     favorite = models.ManyToManyField(
         User,
         verbose_name='Любимые рецепты',
-        related_name='favorites'
+        related_name='favorites',
+        blank=True,
     )
     tags = models.ManyToManyField(
         'Tag',
@@ -116,6 +117,8 @@ class IngredientsAmount(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Ингредиенты в рецептах'
+        verbose_name_plural = 'Ингредиенты в рецептах'
         ordering = ('ingredient', )
 
     def __str__(self):

@@ -1,19 +1,41 @@
 from rest_framework import serializers
-from recipes.models import Recipe, Tag, User, IngredientsAmount, Ingredients
+from recipes.models import Recipe, Tag, IngredientsAmount, Ingredients
+from users.models import Follow, User
+from django.db.models import Q
 
 
 class TagSerializer(serializers.ModelSerializer):
     """Сериализатор для Тегов"""
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'color', 'slug')
+        fields = (
+            'id',
+            'name',
+            'color',
+            'slug'
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для модели пользователя"""
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+        )
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return Follow.objects.filter(
+            Q(user_id=request.user.id) & Q(author_id=obj.id)
+        ).exists()
 
 
 class IngredientInRecipesSerializer(serializers.ModelSerializer):

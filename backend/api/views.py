@@ -1,9 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny
+from rest_framework.pagination import PageNumberPagination
 from recipes.models import Recipe, Ingredients, Tag
 from .serializers import (
     RecipeSerializer, IngredientSerializer,
     TagSerializer, UserSerializer)
-from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -30,3 +31,4 @@ class TagsViewSet(ModelViewSet):
 class UsersViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
