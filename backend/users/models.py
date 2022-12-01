@@ -10,8 +10,8 @@ class FoodgramUser(AbstractUser):
         unique=True,
     )
     username = models.CharField(
-        verbose_name='Уникальный юзернейм',
-        max_length=245,
+        verbose_name='Уникальное имя',
+        max_length=150,
         blank=False,
         unique=True,
     )
@@ -37,7 +37,7 @@ class FoodgramUser(AbstractUser):
         ordering = ('username',)
 
     def __str__(self):
-        return f'{self.username}: {self.email}'
+        return self.username
 
 
 class Follow(models.Model):

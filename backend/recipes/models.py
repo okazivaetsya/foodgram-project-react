@@ -68,12 +68,14 @@ class Recipe(models.Model):
     favorite = models.ManyToManyField(
         FoodgramUser,
         verbose_name='Любимые рецепты',
-        related_name='favorites'
+        related_name='favorites',
+        blank=True,
     )
     tags = models.ManyToManyField(
         'Tag',
         related_name='recipe',
-        verbose_name='Тэги'
+        verbose_name='Тэги',
+        blank=True,
     )
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления'
@@ -115,6 +117,12 @@ class IngredientsAmount(models.Model):
 
     class Meta:
         ordering = ('ingredient', )
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique_ingredients'
+            ),
+        )
 
     def __str__(self):
-        return f'{self.recipe} {self.ingredient}'
+        return f'{self.recipe}: {self.ingredient}'
