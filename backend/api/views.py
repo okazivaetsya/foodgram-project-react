@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from recipes.models import Recipe, Ingredients, Tag
 from .serializers import (
@@ -14,6 +14,7 @@ class RecipesViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
 
 class IngredientsViewSet(ModelViewSet):
@@ -31,4 +32,4 @@ class TagsViewSet(ModelViewSet):
 class UsersViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )

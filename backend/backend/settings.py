@@ -134,12 +134,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
     'ACTIVATION_URL': False,
     'SET_PASSWORD_RETYPE': False,
+    'SEND_ACTIVATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': False,
     'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['rest_framework.permissions.IsAuthenticated']
+        'user_list': 'rest_framework.permissions.AllowAny',
+        'user': 'rest_framework.permissions.IsAuthenticated'
     },
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',

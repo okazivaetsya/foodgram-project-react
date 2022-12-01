@@ -2,6 +2,7 @@ from rest_framework import serializers
 from recipes.models import Recipe, Tag, IngredientsAmount, Ingredients
 from users.models import Follow, User
 from django.db.models import Q
+from djoser import serializers as djoser_serializers
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -36,6 +37,19 @@ class UserSerializer(serializers.ModelSerializer):
         return Follow.objects.filter(
             Q(user_id=request.user.id) & Q(author_id=obj.id)
         ).exists()
+
+
+class UserCreateSerializer(djoser_serializers.UserCreateSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password'
+        )
 
 
 class IngredientInRecipesSerializer(serializers.ModelSerializer):
