@@ -39,7 +39,7 @@ class Ingredients(models.Model):
 
 
 class TagsInRecipes(models.Model):
-    """Связная модель для тегов в рецептах"""
+    """Модель для тегов в рецептах"""
     tag = models.ForeignKey(
         'Tags',
         on_delete=models.CASCADE,
@@ -120,7 +120,7 @@ class Recipes(models.Model):
 
 
 class IngredientsInRecipes(models.Model):
-    """Связная модель для ингредиентов в рецептах"""
+    """Модель для ингредиентов в рецептах"""
     recipe = models.ForeignKey(
         'Recipes',
         on_delete=models.CASCADE,
@@ -150,7 +150,7 @@ class IngredientsInRecipes(models.Model):
 
 
 class Favorites(models.Model):
-    """Модель для избранных рецептов"""
+    """Модель для хранения избранных рецептов"""
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -178,6 +178,7 @@ class Favorites(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Модель для хранения списка покупок"""
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
