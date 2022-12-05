@@ -6,35 +6,35 @@ from .models import (
 )
 
 
-class TagAdmin(admin.ModelAdmin):
+class FoodgramAdminModel(admin.ModelAdmin):
+    empty_value_display = '-пусто-'
+
+
+class TagAdmin(FoodgramAdminModel):
     list_display = ('id', 'name', 'color', 'slug')
     search_fields = ('name', 'slug')
     list_filter = ('name', 'slug', 'color')
-    empty_value_display = '-пусто-'
 
 
-class TagsInRecipesAdmin(admin.ModelAdmin):
+class TagsInRecipesAdmin(FoodgramAdminModel):
     list_display = ('id', 'tag', 'recipe')
     search_fields = ('tag', 'recipe')
     list_filter = ('tag', 'recipe')
-    empty_value_display = '-пусто-'
 
 
-class IngredientsAdmin(admin.ModelAdmin):
+class IngredientsAdmin(FoodgramAdminModel):
     list_display = ('id', 'name', 'measurement_unit')
     search_fields = ('name', 'measurement_unit')
     list_filter = ('name', 'measurement_unit')
-    empty_value_display = '-пусто-'
 
 
-class IngredientsInRecipesAdmin(admin.ModelAdmin):
+class IngredientsInRecipesAdmin(FoodgramAdminModel):
     list_display = ('id', 'recipe', 'ingredient')
     search_fields = ('recipe', 'ingredient')
     list_filter = ('recipe', 'ingredient')
-    empty_value_display = '-пусто-'
 
 
-class RecipesAdmin(admin.ModelAdmin):
+class RecipesAdmin(FoodgramAdminModel):
     list_display = (
         'id', 'name',
         'image', 'cooking_time',
@@ -43,18 +43,16 @@ class RecipesAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class FollowAdmin(admin.ModelAdmin):
+class FollowAdmin(FoodgramAdminModel):
     list_display = ('id', 'user', 'author')
     search_fields = ('user', 'author')
     list_filter = ('user', 'author')
-    empty_value_display = '-пусто-'
 
 
-class ShoppingCartAdmin(admin.ModelAdmin):
+class ShoppingCartAdmin(FoodgramAdminModel):
     list_display = ('id', 'user', 'recipe')
     search_fields = ('user', 'recipe')
     list_filter = ('user', 'recipe')
-    empty_value_display = '-пусто-'
 
 
 admin.site.register(Tags, TagAdmin)

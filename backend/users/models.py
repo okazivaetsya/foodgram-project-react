@@ -1,17 +1,29 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
 
-User = get_user_model()
+
+class CustomUser(AbstractUser):
+    email = models.EmailField('email', unique=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = [
+        'username', 'password',
+        'first_name', 'last_name',
+    ]
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
 
 
 class Follow(models.Model):
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='Подписчики'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='Автор'
     )
