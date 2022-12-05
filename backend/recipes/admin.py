@@ -29,7 +29,7 @@ class IngredientsAdmin(FoodgramAdminModel):
 
 
 class IngredientsInRecipesAdmin(FoodgramAdminModel):
-    list_display = ('id', 'recipe', 'ingredient')
+    list_display = ('id', 'recipe', 'ingredient', 'amount')
     search_fields = ('recipe', 'ingredient')
     list_filter = ('recipe', 'ingredient')
 

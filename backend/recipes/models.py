@@ -131,9 +131,19 @@ class IngredientsInRecipes(models.Model):
         on_delete=models.CASCADE,
         related_name='ingredients_in_recipes'
     )
+    amount = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1, 'Минимальное значение для поля - 1')]
+    )
 
     class Meta:
         ordering = ('recipe',)
+        verbose_name_plural = 'Ингредиенты в рецепте'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_ingredients_in_recipe'
+            )
+        ]
 
     def __str__(self) -> str:
         return f'{self.recipe}: {self.ingredient}'
