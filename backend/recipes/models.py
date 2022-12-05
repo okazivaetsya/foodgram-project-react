@@ -12,7 +12,7 @@ class Tags(models.Model):
     slug = models.SlugField(max_length=200, verbose_name='slug')
 
     class Meta:
-        ordering = ('name')
+        ordering = ('name',)
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 
@@ -26,7 +26,7 @@ class Ingredients(models.Model):
     measurement_unit = models.CharField(max_length=200)
 
     class Meta:
-        ordering = ('name')
+        ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         constraints = [
@@ -44,23 +44,23 @@ class TagsInRecipes(models.Model):
     """Связная модель для тегов в рецептах"""
     tag = models.ForeignKey(
         'Tags',
-        on_delete=models.SET_NULL,
-        related_name='recipes'
+        on_delete=models.CASCADE,
+        related_name='tag_in_recipes'
     )
     recipe = models.ForeignKey(
-        'Recipe',
+        'Recipes',
         on_delete=models.CASCADE,
-        related_name='tag'
+        related_name='tag_in_recipes'
     )
 
     class Meta:
-        ordering = ('recipes')
+        ordering = ('recipe',)
         verbose_name = 'Тэг в рецептах'
         verbose_name_plural = 'Тэги в рецептах'
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'measurement_unit'],
-                name='unique_ingredient'
+                fields=['tag', 'recipe'],
+                name='unique_tag'
             )
         ]
 
@@ -124,7 +124,7 @@ class IngredientsInRecipes(models.Model):
     )
     ingredient = models.ForeignKey(
         'Ingredients',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='ingredients_in_recipes'
     )
 
@@ -154,8 +154,8 @@ class Favorites(models.Model):
         ordering = ('user',)
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipes'],
-                name='unique_ingredient'
+                fields=['user', 'recipe'],
+                name='unique_favorite'
             )
         ]
 
@@ -181,7 +181,7 @@ class ShoppingCart(models.Model):
         ordering = ('user',)
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipes'],
+                fields=['user', 'recipe'],
                 name='unique_cart'
             )
         ]
