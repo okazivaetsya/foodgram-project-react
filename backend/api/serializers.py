@@ -5,6 +5,7 @@ from recipes.models import (
 from rest_framework import serializers
 from users.models import CustomUser, Follow
 from djoser.serializers import UserCreateSerializer
+from users.services import check_user_items_in_models
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -38,10 +39,7 @@ class UserSerializer(UserCreateSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return (request.user.is_authenticated and Follow.objects.filter(
-                    user=request.user,
-                    author=obj
-                ).exists())
+        return check_user_items_in_models(Follow, request, obj)
 
 
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
@@ -92,14 +90,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorite(self, obj):
         request = self.context.get('request')
-        return (request.user.is_authenticated and Favorites.objects.filter(
-                    user=request.user,
-                    recipe=obj
-                ).exists())
+        return check_user_items_in_models(Favorites, request, obj)
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        return (request.user.is_authenticated and ShoppingCart.objects.filter(
-                    user=request.user,
-                    recipe=obj
-                ).exists())
+        return check_user_items_in_models(ShoppingCart, request, obj)
