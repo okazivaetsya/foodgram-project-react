@@ -1,4 +1,7 @@
-from recipes.models import Ingredients, IngredientsInRecipes, Recipes, Tags
+from recipes.models import (
+    Ingredients, IngredientsInRecipes,
+    Recipes, Tags, Favorites
+)
 from rest_framework import serializers
 from users.models import CustomUser, Follow
 from djoser.serializers import UserCreateSerializer
@@ -63,6 +66,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для рецептов"""
+    is_favorite = serializers.SerializerMethodField(read_only=True)
     tags = TagsSerializer(many=True)
     ingredients = IngredientsInRecipeSerializer(
         source='ingredients_in_recipes',
@@ -77,8 +81,16 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
+            'is_favorite',
             'name',
             'image',
             'text',
             'cooking_time'
         )
+
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        return (request.user.is_authenticated and Favorites.objects.filter(
+                    user=request.user,
+                    recipe=obj
+                ).exists())

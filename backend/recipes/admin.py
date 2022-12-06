@@ -2,7 +2,7 @@ from django.contrib import admin
 from users.models import Follow
 from .models import (
     Tags, TagsInRecipes, Recipes, Ingredients,
-    IngredientsInRecipes, ShoppingCart
+    IngredientsInRecipes, ShoppingCart, Favorites
 )
 
 
@@ -48,6 +48,15 @@ class RecipesAdmin(FoodgramAdminModel):
     )
 
 
+class FavoriteRecipesAdmin(FoodgramAdminModel):
+    """Настройки для модели избранных рецептов"""
+    list_display = (
+        'user', 'recipe'
+    )
+    search_fields = ('user', 'recipe')
+    list_filter = ('user', 'recipe')
+
+
 class FollowAdmin(FoodgramAdminModel):
     """Настройки для модели Подписки"""
     list_display = ('id', 'user', 'author')
@@ -68,4 +77,5 @@ admin.site.register(Ingredients, IngredientsAdmin)
 admin.site.register(IngredientsInRecipes, IngredientsInRecipesAdmin)
 admin.site.register(Recipes, RecipesAdmin)
 admin.site.register(Follow, FollowAdmin)
+admin.site.register(Favorites, FavoriteRecipesAdmin)
 admin.site.register(ShoppingCart, ShoppingCartAdmin)

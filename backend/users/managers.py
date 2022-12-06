@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
+from .services import check_empty_fields
 
 
 class CustomUserManager(BaseUserManager):
@@ -14,16 +15,7 @@ class CustomUserManager(BaseUserManager):
         Создаем и сохраняем пользователя с обязательными полями:
         email, username, first_name, last_name, password.
         """
-        if not email:
-            raise ValueError('Поле Email является обязательным')
-        if not username:
-            raise ValueError('Поле username является обязательным')
-        if not first_name:
-            raise ValueError('Поле first_name является обязательным')
-        if not last_name:
-            raise ValueError('Поле last_name является обязательным')
-        if not password:
-            raise ValueError('Поле password является обязательным')
+        check_empty_fields(email, username, first_name, last_name, password)
         email = self.normalize_email(email)
         user = self.model(
             email=email,
@@ -48,10 +40,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
         return self.create_user(
             email, username,
             first_name, last_name,
