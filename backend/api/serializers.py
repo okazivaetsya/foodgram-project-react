@@ -1,6 +1,7 @@
+from recipes.models import Ingredients, IngredientsInRecipes, Recipes, Tags
 from rest_framework import serializers
-from recipes.models import Tags, Recipes, Ingredients, IngredientsInRecipes
 from users.models import CustomUser, Follow
+from djoser.serializers import UserCreateSerializer
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -16,7 +17,7 @@ class TagsSerializer(serializers.ModelSerializer):
         )
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UserCreateSerializer):
     """Сериализатор для вывода данных пользоваетля"""
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
@@ -29,12 +30,13 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
+            'password'
         )
 
-    def get_is_subscribed(self, obj):  # заработает как прикрутим аутетификацию
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return (request.user.is_authenticated and Follow.objects.filter(
-                    user=self.context['request'].user,
+                    user=request.user,
                     author=obj
                 ).exists())
 
