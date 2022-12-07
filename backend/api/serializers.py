@@ -47,6 +47,14 @@ class UserSerializer(UserCreateSerializer):
                 ).exists())
 
 
+class IngredientForRecipePostSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='ingredient.id')
+
+    class Meta:
+        model = IngredientsInRecipes
+        fields = ('id', 'amount')
+
+
 class IngredientsInRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для кол-ва ингредиентов в рецептах"""
     id = serializers.ReadOnlyField(source='ingredient.id')
@@ -62,6 +70,7 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для ингредиентов"""
+
     class Meta:
         model = Ingredients
         fields = ('id', 'name', 'measurement_unit')
@@ -109,7 +118,7 @@ class RecipePostSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tags.objects.all(),
         many=True)
-    ingredients = IngredientsInRecipeSerializer(
+    ingredients = IngredientForRecipePostSerializer(
         source='ingredients_in_recipes', many=True)
     image = Base64ImageField(max_length=None, use_url=False,)
 
@@ -135,12 +144,12 @@ class RecipePostSerializer(serializers.ModelSerializer):
             recipe.save()
         for ingredient in ingredients:
             if not IngredientsInRecipes.objects.filter(
-                    ingredient_id=ingredient['id'],
+                    ingredient_id=ingredient['ingredient']['id'],
                     recipe=recipe).exists():
                 new_ingredient_in_recipe = IngredientsInRecipes.objects.create(
-                    ingredient_id=ingredient['id'],
-                    recipe=recipe)
-                new_ingredient_in_recipe.amount = ingredient['amount']
+                    ingredient_id=ingredient['ingredient']['id'],
+                    recipe=recipe,
+                    amount=ingredient['amount'])
                 new_ingredient_in_recipe.save()
             else:
                 IngredientsInRecipes.objects.filter(
@@ -152,12 +161,12 @@ class RecipePostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         author = validated_data.get('author')
-        tags = validated_data.pop('tags')
+        tags = validated_data.get('tags')
         name = validated_data.get('name')
         image = validated_data.get('image')
         text = validated_data.get('text')
         cooking_time = validated_data.get('cooking_time')
-        ingredients = validated_data.pop('ingredients_in_recipes')
+        ingredients = validated_data.get('ingredients_in_recipes')
         recipe = Recipes.objects.create(
             author=author,
             name=name,
