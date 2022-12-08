@@ -1,8 +1,9 @@
+from selectors import SelectorKey
 from rest_framework import status
 from django.shortcuts import get_list_or_404, get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.response import Response
-from recipes.models import Ingredients, Recipes, Tags
+from recipes.models import Ingredients, Recipes, Tags, Favorites
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 
@@ -10,7 +11,7 @@ from users.models import CustomUser, Follow
 
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           TagsSerializer, UserSerializer, RecipePostSerializer,
-                          FollowSerializer)
+                          FollowSerializer, RecipeInSubscriptionSerializer)
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -56,7 +57,7 @@ class FollowViewSet(viewsets.ModelViewSet):
         return get_list_or_404(CustomUser, following__user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        author_id = self.kwargs.get('users_id')
+        author_id = self.kwargs.get('user_id')
         author = get_object_or_404(CustomUser, id=author_id)
         Follow.objects.create(
             user=request.user, author=author
@@ -65,7 +66,7 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     def delete(self, request, *args, **kwargs):
         print(f'self.kwargs = {self.kwargs}')
-        author_id = self.kwargs.get('users_id')
+        author_id = self.kwargs.get('user_id')
         print(f'author_id = {author_id}')
         user_id = request.user.id
         print(f'user = {request.user}')
@@ -74,4 +75,29 @@ class FollowViewSet(viewsets.ModelViewSet):
         )
         print(f'subscribe = {subscribe}')
         subscribe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    serializer_class = RecipeInSubscriptionSerializer
+
+    def get_queryset(self):
+        return get_list_or_404(Recipes, Favorites__user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        recipe_id = self.kwargs.get('recipe_id')
+        print(f'recipe_id={recipe_id}')
+        recipe = get_object_or_404(Recipes, id=recipe_id)
+        print(f'recipe={recipe}')
+        Favorites.objects.create(user=request.user, recipe=recipe)
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        user_id = request.user.id
+        recipe_id = self.kwargs.get('recipe_id')
+        recipe = get_object_or_404(
+            Favorites, user__id=user_id,
+            recipe__id=recipe_id
+        )
+        recipe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
