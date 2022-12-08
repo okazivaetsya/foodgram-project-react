@@ -1,9 +1,8 @@
-from selectors import SelectorKey
 from rest_framework import status
 from django.shortcuts import get_list_or_404, get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.response import Response
-from recipes.models import Ingredients, Recipes, Tags, Favorites
+from recipes.models import Ingredients, Recipes, Tags, Favorites, ShoppingCart
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 
@@ -86,9 +85,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
-        print(f'recipe_id={recipe_id}')
         recipe = get_object_or_404(Recipes, id=recipe_id)
-        print(f'recipe={recipe}')
         Favorites.objects.create(user=request.user, recipe=recipe)
         return Response(status=status.HTTP_201_CREATED)
 
@@ -97,6 +94,29 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(
             Favorites, user__id=user_id,
+            recipe__id=recipe_id
+        )
+        recipe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    serializer_class = RecipeInSubscriptionSerializer
+
+    def get_queryset(self):
+        return get_list_or_404(Recipes, shopping_cart__user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        recipe_id = self.kwargs.get('recipe_id')
+        recipe = get_object_or_404(Recipes, id=recipe_id)
+        ShoppingCart.objects.create(user=request.user, recipe=recipe)
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        user_id = request.user.id
+        recipe_id = self.kwargs.get('recipe_id')
+        recipe = get_object_or_404(
+            ShoppingCart, user__id=user_id,
             recipe__id=recipe_id
         )
         recipe.delete()
