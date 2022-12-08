@@ -188,4 +188,4 @@ class RecipePostSerializer(serializers.ModelSerializer):
             tags, ingredients, instance)
         super().update(instance, validated_data)
         instance.save()
-        return
+        return instance
