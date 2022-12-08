@@ -58,36 +58,34 @@ class FollowViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         author_id = self.kwargs.get('user_id')
         author = get_object_or_404(CustomUser, id=author_id)
-        Follow.objects.create(
-            user=request.user, author=author
-        )
-        return Response(status=status.HTTP_201_CREATED)
+        if author == request.user:
+            raise ValueError('Нельзя подписываться на самого себя')
+        else:
+            Follow.objects.create(
+                user=request.user, author=author
+            )
+            return Response(status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
-        print(f'self.kwargs = {self.kwargs}')
         author_id = self.kwargs.get('user_id')
-        print(f'author_id = {author_id}')
         user_id = request.user.id
-        print(f'user = {request.user}')
         subscribe = get_object_or_404(
             Follow, user__id=user_id, author__id=author_id
         )
-        print(f'subscribe = {subscribe}')
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeInSubscriptionSerializer
-
-    def get_queryset(self):
-        return get_list_or_404(Recipes, Favorites__user=self.request.user)
+    queryset = Favorites.objects.all()
 
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipes, id=recipe_id)
+        serializer = RecipeInSubscriptionSerializer(recipe)
         Favorites.objects.create(user=request.user, recipe=recipe)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
@@ -102,15 +100,14 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeInSubscriptionSerializer
-
-    def get_queryset(self):
-        return get_list_or_404(Recipes, shopping_cart__user=self.request.user)
+    queryset = ShoppingCart.objects.all()
 
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipes, id=recipe_id)
+        serializer = RecipeInSubscriptionSerializer(recipe)
         ShoppingCart.objects.create(user=request.user, recipe=recipe)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
