@@ -189,3 +189,42 @@ class RecipePostSerializer(serializers.ModelSerializer):
         super().update(instance, validated_data)
         instance.save()
         return instance
+
+
+class RecipeInSubscriptionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipes
+        fields = ('id', 'name', 'cooking_time', 'image')
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return (request.user.is_authenticated and Follow.objects.filter(
+                    user=request.user,
+                    author=obj
+                ).exists())
+
+    def get_recipes_count(self, obj):
+        return Recipes.objects.filter(author__id=obj.id).count()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        if request.GET.get('recipes_limit'):
+            recipes_limit = int(request.GET.get('recipes_limit'))
+            queryset = Recipes.objects.filter(
+                author__id=obj.id).order_by('id')[:recipes_limit]
+        else:
+            queryset = Recipes.objects.filter(
+                author__id=obj.id).order_by('id')
+        return RecipeInSubscriptionSerializer(queryset, many=True).data
