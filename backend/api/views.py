@@ -1,10 +1,12 @@
 from rest_framework import status
+from rest_framework import filters
 from django.shortcuts import get_list_or_404, get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.response import Response
 from recipes.models import Ingredients, Recipes, Tags, Favorites, ShoppingCart
 from rest_framework import viewsets
 from .pagination import FoodgramPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from users.models import CustomUser, Follow
 
@@ -24,6 +26,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами"""
     queryset = Recipes.objects.all()
     pagination_class = FoodgramPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('tags', 'author')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -40,6 +44,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
 
 
 class CreateUserView(UserViewSet):
