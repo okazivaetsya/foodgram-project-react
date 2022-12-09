@@ -4,7 +4,7 @@ from djoser.views import UserViewSet
 from rest_framework.response import Response
 from recipes.models import Ingredients, Recipes, Tags, Favorites, ShoppingCart
 from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
+from .pagination import FoodgramPagination
 
 from users.models import CustomUser, Follow
 
@@ -23,7 +23,7 @@ class TagsViewSet(viewsets.ModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами"""
     queryset = Recipes.objects.all()
-    pagination_class = PageNumberPagination
+    pagination_class = FoodgramPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -43,6 +43,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
 
 
 class CreateUserView(UserViewSet):
+    pagination_class = FoodgramPagination
     serializer_class = UserSerializer
 
     def get_queryset(self):
