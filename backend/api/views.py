@@ -51,6 +51,7 @@ class CreateUserView(UserViewSet):
 
 
 class FollowViewSet(viewsets.ModelViewSet):
+    pagination_class = FoodgramPagination
     serializer_class = FollowSerializer
 
     def get_queryset(self):
