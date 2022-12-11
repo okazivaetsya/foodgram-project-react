@@ -5,6 +5,7 @@ from recipes.models import Favorites, Ingredients, Recipes, ShoppingCart, Tags
 from rest_framework import filters, permissions, status, viewsets, serializers
 from rest_framework.response import Response
 from users.models import CustomUser, Follow
+from .download_cart import DownloadCartView
 
 from .filters import RecipeFilter
 from .pagination import FoodgramPagination
@@ -82,7 +83,8 @@ class FollowViewSet(viewsets.ModelViewSet):
             Follow.objects.create(
                 user=request.user, author=author
             )
-            serializer = FollowSerializer(author, context={'request': request})
+            print(f'REQUEST = {request}')
+            serializer = FollowSerializer(author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
@@ -135,16 +137,35 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipes, id=recipe_id)
-        serializer = SimpleRecipeSerializer(recipe)
-        ShoppingCart.objects.create(user=request.user, recipe=recipe)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if ShoppingCart.objects.filter(
+            user=request.user, recipe=recipe
+        ).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Данный рецепт уже добавлен в список покупок.'}
+            )
+        else:
+            serializer = SimpleRecipeSerializer(recipe)
+            ShoppingCart.objects.create(user=request.user, recipe=recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
         recipe_id = self.kwargs.get('recipe_id')
-        recipe = get_object_or_404(
-            ShoppingCart, user__id=user_id,
+        if not ShoppingCart.objects.filter(
+            user__id=user_id,
             recipe__id=recipe_id
-        )
-        recipe.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        ).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Такого рецепта нет в списке покупок'}
+            )
+        else:
+            recipe = get_object_or_404(
+                ShoppingCart, user__id=user_id,
+                recipe__id=recipe_id
+            )
+            recipe.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DownloadCart(DownloadCartView):
+    permission_classes = [permissions.IsAuthenticated]
