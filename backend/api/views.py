@@ -1,18 +1,17 @@
-from rest_framework import status
-from rest_framework import filters
 from django.shortcuts import get_list_or_404, get_object_or_404
-from djoser.views import UserViewSet
-from rest_framework.response import Response
-from recipes.models import Ingredients, Recipes, Tags, Favorites, ShoppingCart
-from rest_framework import viewsets
-from .pagination import FoodgramPagination
 from django_filters.rest_framework import DjangoFilterBackend
-
+from djoser.views import UserViewSet
+from recipes.models import Favorites, Ingredients, Recipes, ShoppingCart, Tags
+from rest_framework import filters, permissions, status, viewsets, serializers
+from rest_framework.response import Response
 from users.models import CustomUser, Follow
 
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          TagsSerializer, UserSerializer, RecipePostSerializer,
-                          FollowSerializer, RecipeInSubscriptionSerializer)
+from .filters import RecipeFilter
+from .pagination import FoodgramPagination
+from .serializers import (FollowSerializer, IngredientSerializer,
+                          RecipePostSerializer, RecipeSerializer,
+                          SimpleRecipeSerializer, TagsSerializer,
+                          UserSerializer)
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -26,8 +25,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами"""
     queryset = Recipes.objects.all()
     pagination_class = FoodgramPagination
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('tags', 'author')
+    filter_class = RecipeFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -43,12 +43,14 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с ингредиентами"""
     queryset = Ingredients.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = [permissions.AllowAny]
     pagination_class = None
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
 
 class CreateUserView(UserViewSet):
+    """Вьюсет для работы с пользователями"""
     pagination_class = FoodgramPagination
     serializer_class = UserSerializer
 
@@ -57,8 +59,10 @@ class CreateUserView(UserViewSet):
 
 
 class FollowViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с подписками"""
     pagination_class = FoodgramPagination
     serializer_class = FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return get_list_or_404(CustomUser, following__user=self.request.user)
@@ -67,12 +71,19 @@ class FollowViewSet(viewsets.ModelViewSet):
         author_id = self.kwargs.get('user_id')
         author = get_object_or_404(CustomUser, id=author_id)
         if author == request.user:
-            raise ValueError('Нельзя подписываться на самого себя')
+            raise serializers.ValidationError(
+                {'errors': 'Нельзя подписываться на самого себя.'}
+            )
+        if self.request.user.follower.filter(author=author).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Вы уже подписаны на данного автора.'}
+            )
         else:
             Follow.objects.create(
                 user=request.user, author=author
             )
-            return Response(status=status.HTTP_201_CREATED)
+            serializer = FollowSerializer(author, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         author_id = self.kwargs.get('user_id')
@@ -85,15 +96,24 @@ class FollowViewSet(viewsets.ModelViewSet):
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeInSubscriptionSerializer
+    """Вьюсет для работы с избранными рецептами"""
+    serializer_class = SimpleRecipeSerializer
     queryset = Favorites.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipes, id=recipe_id)
-        serializer = RecipeInSubscriptionSerializer(recipe)
-        Favorites.objects.create(user=request.user, recipe=recipe)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if Favorites.objects.filter(user=request.user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                {'errors': 'Данный рецепт уже в списке избранных рецептов.'}
+            )
+        else:
+            Favorites.objects.create(user=request.user, recipe=recipe)
+            serializer = SimpleRecipeSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
@@ -107,13 +127,15 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeInSubscriptionSerializer
+    """Вьюсет для работы со списком покупок"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = SimpleRecipeSerializer
     queryset = ShoppingCart.objects.all()
 
     def create(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipes, id=recipe_id)
-        serializer = RecipeInSubscriptionSerializer(recipe)
+        serializer = SimpleRecipeSerializer(recipe)
         ShoppingCart.objects.create(user=request.user, recipe=recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

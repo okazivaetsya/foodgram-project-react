@@ -4,6 +4,10 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
+    """
+    Кастомная модель пользователя с переопределнным основным полем
+    Основным полем является не 'username' а 'email'
+    """
     email = models.EmailField('email', unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = [
@@ -17,6 +21,7 @@ class CustomUser(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель для подписков на авторов"""
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,

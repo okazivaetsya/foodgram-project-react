@@ -7,8 +7,8 @@ def check_empty_fields(*fields):
 
 def check_user_items_in_models(model, request, obj):
     """
-    Проеверка на наличие элеемнта в связной модели.
-    Возвращает TRUE если пользователь имеет в связной модели данный объект.
+    Проеверка на наличие элемнта в связной модели.
+    Возвращает TRUE если пользователь имеет в связной модели данную запись.
     """
     return (request.user.is_authenticated and model.objects.filter(
                     user=request.user,
