@@ -1,34 +1,45 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
 
-User = get_user_model()
+
+class CustomUser(AbstractUser):
+    """
+    Кастомная модель пользователя с переопределнным основным полем
+    Основным полем является не 'username' а 'email'
+    """
+    email = models.EmailField('email', unique=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = [
+        'username', 'password',
+        'first_name', 'last_name',
+    ]
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
 
 
 class Follow(models.Model):
+    """Модель для подписков на авторов"""
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
-        null=True,
-        related_name='follower',
-        verbose_name='Подписчик'
+        related_name='follower'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
-        null=True,
-        related_name='following',
-        verbose_name='Автор рецепта'
+        related_name='following'
     )
 
     class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        constraints = (
+        constraints = [
             models.UniqueConstraint(
-                fields=('user', 'author'),
+                fields=['user', 'author'],
                 name='unique_following'
-            ),
-        )
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} -> {self.author}'
