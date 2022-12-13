@@ -80,7 +80,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для рецептов"""
-    is_favorite = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
     tags = TagsSerializer(many=True)
     ingredients = IngredientsInRecipeSerializer(
@@ -96,7 +96,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            'is_favorite',
+            'is_favorited',
             'is_in_shopping_cart',
             'name',
             'image',
@@ -104,7 +104,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         """Метод проверяет является ли рецепт любимым(избранным)"""
         request = self.context.get('request')
         return check_user_items_in_models(Favorites, request, obj)
@@ -117,8 +117,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipePostSerializer(serializers.ModelSerializer):
     """Сериализатор для Рецептов для метода POST"""
-    is_favorite = serializers.SerializerMethodField(read_only=True)
-    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
     author = UserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tags.objects.all(),
@@ -131,9 +131,9 @@ class RecipePostSerializer(serializers.ModelSerializer):
         model = Recipes
         fields = ('id', 'author', 'name', 'image', 'text',
                   'ingredients', 'tags', 'cooking_time',
-                  'is_in_shopping_cart', 'is_favorite')
+                  'is_in_shopping_cart', 'is_favorited')
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         """Метод проверяет является ли рецепт любимым(избранным)"""
         request = self.context.get('request')
         return check_user_items_in_models(Favorites, request, obj)
