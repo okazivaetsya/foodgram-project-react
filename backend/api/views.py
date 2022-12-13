@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from users.models import CustomUser, Follow
 from .download_cart import DownloadCartView
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientsFilter
 from .pagination import FoodgramPagination
 from .serializers import (FollowSerializer, IngredientSerializer,
                           RecipePostSerializer, RecipeSerializer,
@@ -28,7 +28,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = FoodgramPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
-    filter_class = RecipeFilter
+    filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -46,8 +46,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = None
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientsFilter
 
 
 class CreateUserView(UserViewSet):
@@ -84,7 +84,7 @@ class FollowViewSet(viewsets.ModelViewSet):
                 user=request.user, author=author
             )
             print(f'REQUEST = {request}')
-            serializer = FollowSerializer(author)
+            serializer = FollowSerializer(author, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
