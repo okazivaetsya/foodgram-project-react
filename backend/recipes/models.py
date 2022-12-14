@@ -85,7 +85,7 @@ class Recipes(models.Model):
         upload_to='recipes/images',
         null=True
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
         validators=[
             MinValueValidator(

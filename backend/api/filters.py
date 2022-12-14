@@ -1,11 +1,6 @@
 import django_filters as filters
 from recipes.models import Ingredients, Recipes, Tags
 
-TURN = (
-    (0, 'False'),
-    (1, 'True'),
-)
-
 
 class RecipeFilter(filters.FilterSet):
     """Фильтры для рецептов. """

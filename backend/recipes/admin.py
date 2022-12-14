@@ -1,8 +1,8 @@
 from django.contrib import admin
-from users.models import Follow
+
 from .models import (
-    Tags, TagsInRecipes, Recipes, Ingredients,
-    IngredientsInRecipes, ShoppingCart, Favorites
+    Favorites, Ingredients, IngredientsInRecipes,
+    Recipes, ShoppingCart, Tags, TagsInRecipes
 )
 
 
@@ -11,6 +11,7 @@ class FoodgramAdminModel(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+@admin.register(Tags)
 class TagAdmin(FoodgramAdminModel):
     """Настройки для модели Тэгов"""
     list_display = ('id', 'name', 'color', 'slug')
@@ -18,6 +19,7 @@ class TagAdmin(FoodgramAdminModel):
     list_filter = ('name', 'slug', 'color')
 
 
+@admin.register(TagsInRecipes)
 class TagsInRecipesAdmin(FoodgramAdminModel):
     """Настройки для модели Тегов в рецептах"""
     list_display = ('id', 'tag', 'recipe')
@@ -25,6 +27,7 @@ class TagsInRecipesAdmin(FoodgramAdminModel):
     list_filter = ('tag', 'recipe')
 
 
+@admin.register(Ingredients)
 class IngredientsAdmin(FoodgramAdminModel):
     """Настройки для модели Ингредиентов"""
     list_display = ('id', 'name', 'measurement_unit')
@@ -32,6 +35,7 @@ class IngredientsAdmin(FoodgramAdminModel):
     list_filter = ('name', 'measurement_unit')
 
 
+@admin.register(IngredientsInRecipes)
 class IngredientsInRecipesAdmin(FoodgramAdminModel):
     """Настройки для модели Ингредиентов в рецептах"""
     list_display = ('id', 'recipe', 'ingredient', 'amount')
@@ -39,6 +43,7 @@ class IngredientsInRecipesAdmin(FoodgramAdminModel):
     list_filter = ('recipe', 'ingredient')
 
 
+@admin.register(Recipes)
 class RecipesAdmin(FoodgramAdminModel):
     """Настройки для модели Рецептов"""
     list_display = (
@@ -48,6 +53,7 @@ class RecipesAdmin(FoodgramAdminModel):
     )
 
 
+@admin.register(Favorites)
 class FavoriteRecipesAdmin(FoodgramAdminModel):
     """Настройки для модели избранных рецептов"""
     list_display = (
@@ -57,25 +63,9 @@ class FavoriteRecipesAdmin(FoodgramAdminModel):
     list_filter = ('user', 'recipe')
 
 
-class FollowAdmin(FoodgramAdminModel):
-    """Настройки для модели Подписки"""
-    list_display = ('id', 'user', 'author')
-    search_fields = ('user', 'author')
-    list_filter = ('user', 'author')
-
-
+@admin.register(ShoppingCart)
 class ShoppingCartAdmin(FoodgramAdminModel):
     """Настройки для модели Списка покупок"""
     list_display = ('id', 'user', 'recipe')
     search_fields = ('user', 'recipe')
     list_filter = ('user', 'recipe')
-
-
-admin.site.register(Tags, TagAdmin)
-admin.site.register(TagsInRecipes, TagsInRecipesAdmin)
-admin.site.register(Ingredients, IngredientsAdmin)
-admin.site.register(IngredientsInRecipes, IngredientsInRecipesAdmin)
-admin.site.register(Recipes, RecipesAdmin)
-admin.site.register(Follow, FollowAdmin)
-admin.site.register(Favorites, FavoriteRecipesAdmin)
-admin.site.register(ShoppingCart, ShoppingCartAdmin)

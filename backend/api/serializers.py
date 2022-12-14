@@ -1,7 +1,9 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
-                            Recipes, ShoppingCart, Tags, TagsInRecipes)
+from recipes.models import (
+    Favorites, Ingredients, IngredientsInRecipes,
+    Recipes, ShoppingCart, Tags, TagsInRecipes
+)
 from rest_framework import serializers
 from users.models import CustomUser, Follow
 from users.services import check_user_items_in_models
@@ -159,9 +161,6 @@ class RecipePostSerializer(serializers.ModelSerializer):
                     amount=ingredient['amount'])
                 new_ingredient_in_recipe.save()
             else:
-                IngredientsInRecipes.objects.filter(
-                    recipe=recipe).delete()
-                recipe.delete()
                 raise serializers.ValidationError(
                     'Неьзя добавлять один ингредиент дважды!')
         return recipe

@@ -2,17 +2,17 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import Favorites, Ingredients, Recipes, ShoppingCart, Tags
-from rest_framework import permissions, status, viewsets, serializers
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.response import Response
 from users.models import CustomUser, Follow
-from .download_cart import DownloadCartView
 
-from .filters import RecipeFilter, IngredientsFilter
+from .download_cart import DownloadCartView
+from .filters import IngredientsFilter, RecipeFilter
 from .pagination import FoodgramPagination
-from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipePostSerializer, RecipeSerializer,
-                          SimpleRecipeSerializer, TagsSerializer,
-                          UserSerializer)
+from .serializers import (
+    FollowSerializer, IngredientSerializer, RecipePostSerializer,
+    RecipeSerializer, SimpleRecipeSerializer, TagsSerializer, UserSerializer
+)
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -36,8 +36,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeSerializer
-        else:
-            return RecipePostSerializer
+        return RecipePostSerializer
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -79,13 +78,11 @@ class FollowViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 {'errors': 'Вы уже подписаны на данного автора.'}
             )
-        else:
-            Follow.objects.create(
-                user=request.user, author=author
-            )
-            print(f'REQUEST = {request}')
-            serializer = FollowSerializer(author, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        Follow.objects.create(
+            user=request.user, author=author
+        )
+        serializer = FollowSerializer(author, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         author_id = self.kwargs.get('user_id')
@@ -110,12 +107,11 @@ class FavoriteViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 {'errors': 'Данный рецепт уже в списке избранных рецептов.'}
             )
-        else:
-            Favorites.objects.create(user=request.user, recipe=recipe)
-            serializer = SimpleRecipeSerializer(
-                recipe, context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        Favorites.objects.create(user=request.user, recipe=recipe)
+        serializer = SimpleRecipeSerializer(
+            recipe, context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
@@ -143,10 +139,9 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 {'errors': 'Данный рецепт уже добавлен в список покупок.'}
             )
-        else:
-            serializer = SimpleRecipeSerializer(recipe)
-            ShoppingCart.objects.create(user=request.user, recipe=recipe)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = SimpleRecipeSerializer(recipe)
+        ShoppingCart.objects.create(user=request.user, recipe=recipe)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = request.user.id
@@ -158,13 +153,12 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 {'errors': 'Такого рецепта нет в списке покупок'}
             )
-        else:
-            recipe = get_object_or_404(
-                ShoppingCart, user__id=user_id,
-                recipe__id=recipe_id
-            )
-            recipe.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        recipe = get_object_or_404(
+            ShoppingCart, user__id=user_id,
+            recipe__id=recipe_id
+        )
+        recipe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class DownloadCart(DownloadCartView):

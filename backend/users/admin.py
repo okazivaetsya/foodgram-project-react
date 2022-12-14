@@ -1,10 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser
+from .models import CustomUser, Follow
+from recipes.admin import FoodgramAdminModel
 
 
+@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
+    """Настройка админки для модели кастомного пользователя"""
     model = CustomUser
     list_display = (
         'email', 'username',
@@ -16,4 +19,9 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+@admin.register(Follow)
+class FollowAdmin(FoodgramAdminModel):
+    """Настройки для модели Подписки"""
+    list_display = ('id', 'user', 'author')
+    search_fields = ('user', 'author')
+    list_filter = ('user', 'author')
