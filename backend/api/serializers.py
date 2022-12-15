@@ -4,6 +4,7 @@ from recipes.models import (
     Favorites, Ingredients, IngredientsInRecipes,
     Recipes, ShoppingCart, Tags, TagsInRecipes
 )
+from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from users.models import CustomUser, Follow
 from users.services import check_user_items_in_models
@@ -116,7 +117,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         return check_user_items_in_models(ShoppingCart, request, obj)
 
 
-class RecipePostSerializer(serializers.ModelSerializer):
+class RecipePostSerializer(
+    WritableNestedModelSerializer, serializers.ModelSerializer
+):
     """Сериализатор для Рецептов для метода POST"""
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -151,18 +154,13 @@ class RecipePostSerializer(serializers.ModelSerializer):
         for tag in tags:
             recipe.tags.add(tag)
             recipe.save()
-        for ingredient in ingredients:
-            if not IngredientsInRecipes.objects.filter(
-                    ingredient_id=ingredient['ingredient']['id'],
-                    recipe=recipe).exists():
-                new_ingredient_in_recipe = IngredientsInRecipes.objects.create(
-                    ingredient_id=ingredient['ingredient']['id'],
-                    recipe=recipe,
-                    amount=ingredient['amount'])
-                new_ingredient_in_recipe.save()
-            else:
-                raise serializers.ValidationError(
-                    'Неьзя добавлять один ингредиент дважды!')
+        IngredientsInRecipes.objects.bulk_create(
+            [IngredientsInRecipes(
+                ingredient_id=ingredient['ingredient']['id'],
+                recipe=recipe,
+                amount=ingredient['amount']
+            ) for ingredient in ingredients]
+        )
         return recipe
 
     def create(self, validated_data):
@@ -185,8 +183,8 @@ class RecipePostSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        tags = validated_data.get('tags')
-        ingredients = validated_data.get('ingredients_in_recipes')
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients_in_recipes')
         TagsInRecipes.objects.filter(recipe=instance).delete()
         IngredientsInRecipes.objects.filter(recipe=instance).delete()
         instance = self.add_tags_and_ingredients_to_recipe(
@@ -221,10 +219,12 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """Метод проверяет подписан ли пользователь на автора"""
         request = self.context.get('request')
-        return (request.user.is_authenticated and Follow.objects.filter(
-                    user=request.user,
-                    author=obj
-                ).exists())
+        return (
+            request.user.is_authenticated and Follow.objects.filter(
+                user=request.user,
+                author=obj
+            ).exists()
+        )
 
     def get_recipes_count(self, obj):
         """метод подсчитыает кол-во рецептов у данного автора"""
@@ -233,11 +233,14 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """метод достает рецепты с учетом query параметра recipes_limit"""
         request = self.context.get('request')
+        queryset = Recipes.objects.filter(
+                author__id=obj.id).order_by('id')
         if request.GET.get('recipes_limit'):
             recipes_limit = int(request.GET.get('recipes_limit'))
             queryset = Recipes.objects.filter(
                 author__id=obj.id).order_by('id')[:recipes_limit]
-        else:
-            queryset = Recipes.objects.filter(
-                author__id=obj.id).order_by('id')
         return SimpleRecipeSerializer(queryset, many=True).data
+
+    def validate(self, data):
+        print(f'ДАТА = {data}')
+        return data
