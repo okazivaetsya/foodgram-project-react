@@ -119,14 +119,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         """Формирование и выгрузка pdf со списком покупок"""
         user = request.user
-        ingr = IngredientsInRecipes.objects.filter(
-            recipe__shopping_cart__user=user
-        )
-        print('  ')
-        print('  ')
-        print(f'ингр = {ingr}')
-        print('  ')
-        print('  ')
         ingredients = IngredientsInRecipes.objects.filter(
             recipe__shopping_cart__user=user
         ).values(
@@ -134,11 +126,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).annotate(
             sum_amount=Sum('amount')
         )
-        print('  ')
-        print('  ')
-        print(f'ингредиенты = {ingredients}')
-        print('  ')
-        print('  ')
         shoping_list = []
         shoping_list.append('СПИСОК ПОКУПОК:')
         shoping_list.append('---------')
