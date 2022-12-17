@@ -1,6 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 
-from .services import check_empty_fields
+from .utils import check_empty_fields
 
 
 class CustomUserManager(BaseUserManager):

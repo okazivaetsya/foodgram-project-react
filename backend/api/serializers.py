@@ -1,13 +1,12 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (
-    Favorites, Ingredients, IngredientsInRecipes,
-    Recipes, ShoppingCart, Tags, TagsInRecipes
-)
 from drf_writable_nested import WritableNestedModelSerializer
+
+from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
+                            Recipes, ShoppingCart, Tags, TagsInRecipes)
 from rest_framework import serializers
 from users.models import CustomUser, Follow
-from users.services import check_user_items_in_models
+from users.utils import check_user_items_in_models
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -147,8 +146,9 @@ class RecipePostSerializer(
         request = self.context.get('request')
         return check_user_items_in_models(ShoppingCart, request, obj)
 
-    def add_tags_and_ingredients_to_recipe(
-        self, tags, ingredients, recipe
+    @staticmethod
+    def __add_tags_and_ingredients_to_recipe(
+        tags, ingredients, recipe
     ):
         """Метод добавляет тэги и ингредиенты к основным полям рецептов"""
         for tag in tags:
@@ -204,6 +204,45 @@ class SimpleRecipeSerializer(serializers.ModelSerializer):
         model = Recipes
         fields = ('id', 'name', 'cooking_time', 'image')
 
+    def validate(self, data):
+        if ShoppingCart.objects.filter(
+                user=self.context.get('request').user,
+                recipe=data['id']
+        ).exists():
+            raise serializers.ValidationError({
+                'errors': 'Рецепт уже добавлен в список покупок.'
+            })
+        return data
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    recipe = serializers.PrimaryKeyRelatedField(
+        queryset=Recipes.objects.all()
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all()
+    )
+
+    class Meta:
+        model = Favorites
+        fields = ('user', 'recipe')
+
+    def validate(self, data):
+        if Favorites.objects.filter(
+                user=self.context.get('request').user,
+                recipe=data['id']
+        ).exists():
+            raise serializers.ValidationError({
+                'errors': 'Рецепт уже добавлен в избранное.'
+            })
+        return data
+
+    def to_representation(self, instance):
+        return SimpleRecipeSerializer(
+            instance,
+            context={'request': self.context.get('request')}
+        ).data
+
 
 class FollowSerializer(serializers.ModelSerializer):
     """Сериализатор для подписок"""
@@ -233,14 +272,26 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """метод достает рецепты с учетом query параметра recipes_limit"""
         request = self.context.get('request')
+        recipes_limit = request.GET.get('recipes_limit')
         queryset = Recipes.objects.filter(
                 author__id=obj.id).order_by('id')
-        if request.GET.get('recipes_limit'):
-            recipes_limit = int(request.GET.get('recipes_limit'))
-            queryset = Recipes.objects.filter(
-                author__id=obj.id).order_by('id')[:recipes_limit]
+        if recipes_limit:
+            return SimpleRecipeSerializer(
+                queryset[:recipes_limit], many=True
+            ).data
         return SimpleRecipeSerializer(queryset, many=True).data
 
     def validate(self, data):
-        print(f'ДАТА = {data}')
+        if Follow.objects.filter(
+                user=self.context.get('request').user,
+                author=data['id']
+        ).exists():
+            raise serializers.ValidationError({
+                'errors': 'Вы уже подписаны на данного автора.'
+            })
+
+        if self.context.get('request').user.id == data['id']:
+            raise serializers.ValidationError({
+                'errors': 'Нельзя подписываться на самого себя'
+            })
         return data

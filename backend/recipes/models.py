@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import CustomUser
 
 
@@ -25,7 +26,7 @@ class Ingredients(models.Model):
         verbose_name='Наименование'
     )
     measurement_unit = models.CharField(
-        max_length=200,
+        max_length=30,
         verbose_name='Единица измерения'
     )
 
