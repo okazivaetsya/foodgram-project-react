@@ -1,11 +1,35 @@
-def get_ingredients_list(data):
-    my_list = []
-    my_list.append('СПИСОК ПОКУПОК:')
-    my_list.append('---------')
+import io
+
+from django.http import FileResponse
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+
+
+def create_pdf(data, file_name='shopping_list.pdf'):
+    shoping_list = []
+    shoping_list.append('СПИСОК ПОКУПОК:')
+    shoping_list.append('---------')
     for item in data:
-        my_list.append(
+        shoping_list.append(
             f"{item['ingredient__name']} – "
             f"{item['sum_amount']}"
             f"({item['ingredient__measurement_unit']})"
         )
-    return my_list
+    pdfmetrics.registerFont(TTFont('Ubuntu', './api/fonts/Ubuntu-C.ttf'))
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    font_size = 15
+    p.setFont('Ubuntu', font_size)
+    start_x = 50 # начало строки по оси Х 
+    start_y = 800 # начало строки по оси Y
+    for string_line in shoping_list:
+        p.drawString(start_x, start_y, string_line)
+        start_y -= 15
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return FileResponse(
+        buffer, as_attachment=True,
+        filename=file_name
+    )

@@ -1,16 +1,11 @@
-import io
-
 from django.db.models import Sum
-from django.http import FileResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
-                            Recipes, ShoppingCart, Tags)
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
+from recipes.models import (
+    Favorites, Ingredients, IngredientsInRecipes,
+    Recipes, ShoppingCart, Tags
+)
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,11 +13,13 @@ from users.models import CustomUser, Follow
 
 from .filters import IngredientsFilter, RecipeFilter
 from .pagination import FoodgramPagination
-from .serializers import (FavoriteSerializer, FollowSerializer,
-                          IngredientSerializer, RecipePostSerializer,
-                          RecipeSerializer, SimpleRecipeSerializer,
-                          TagsSerializer, UserSerializer)
-from .services import get_ingredients_list
+from .serializers import (
+    FavoriteSerializer, FollowSerializer,
+    IngredientSerializer, RecipePostSerializer,
+    RecipeSerializer, SimpleRecipeSerializer,
+    TagsSerializer, UserSerializer
+)
+from .services import create_pdf
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -48,6 +45,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipePostSerializer
 
+    @staticmethod
     def _add_recipe_to(self, request, pk, model, my_serializer):
         recipe_id = pk
         if request.method == 'POST':
@@ -97,25 +95,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).annotate(
             sum_amount=Sum('amount')
         )
-        shoping_list = get_ingredients_list(ingredients)
-        pdfmetrics.registerFont(TTFont('Ubuntu', './api/fonts/Ubuntu-C.ttf'))
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer)
-        font_size = 15
-        p.setFont('Ubuntu', font_size)
-        start_x = 50
-        start_y = 800
-        for string_line in shoping_list:
-            p.drawString(start_x, start_y, string_line)
-            start_y -= 15
-        p.showPage()
-        p.save()
-        buffer.seek(0)
-        return FileResponse(
-            buffer, as_attachment=True,
-            filename='shopping_list.pdf'
-        )
-
+        return create_pdf(ingredients, 'new_shopping_list.pdf')
 
 class IngredientsViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с ингредиентами"""
@@ -127,7 +107,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     filterset_class = IngredientsFilter
 
 
-class CreateUserView(UserViewSet):
+class CustomUserView(UserViewSet):
     """Вьюсет для работы с пользователями"""
     pagination_class = FoodgramPagination
     serializer_class = UserSerializer
