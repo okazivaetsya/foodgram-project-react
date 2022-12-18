@@ -11,7 +11,7 @@ services:
   frontend:
     image: okazivaetsya/foodgram_frontend:latest
     volumes:
-      - frontend_value:/app/result_build/build/
+      - ../frontend/:/app/result_build/
 
   backend:
     image: okazivaetsya/foodgram_backend:latest
