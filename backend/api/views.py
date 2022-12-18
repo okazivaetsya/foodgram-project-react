@@ -103,11 +103,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
         p = canvas.Canvas(buffer)
         font_size = 15
         p.setFont('Ubuntu', font_size)
-        START_X = 50
-        START_Y = 800
+        start_x = 50
+        start_y = 800
         for string_line in shoping_list:
-            p.drawString(START_X, START_Y, string_line)
-            START_Y -= 15
+            p.drawString(start_x, start_y, string_line)
+            start_y -= 15
         p.showPage()
         p.save()
         buffer.seek(0)
