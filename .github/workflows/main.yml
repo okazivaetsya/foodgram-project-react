@@ -22,7 +22,7 @@ jobs:
       name: Push Backend Docker image to Docker Hub
       if: github.ref == 'refs/heads/master'
       runs-on: ubuntu-latest
-      needs: tests
+      needs: setup_PIP_and_dependencies
       steps:
         - name: Check out the repo
           uses: actions/checkout@v2 
@@ -44,7 +44,7 @@ jobs:
     name: Push Frontend Docker image to Docker Hub
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    needs: tests
+    needs: setup_PIP_and_dependencies
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
