@@ -3,17 +3,12 @@ LABEL author='Denis Murashov' project_name='foodgram' version='1.0'
 
 RUN mkdir /app
 
-COPY ../requirements.txt /app
+COPY ["../", "/app"]
 
 RUN python -m pip install --upgrade pip
 RUN pip3 install -r /app/requirements.txt --no-cache-dir
-
-COPY ./ /app
-
-RUN python3 app/manage.py makemigrations
+RUN python3 ./app/manage.py makemigrations
 
 WORKDIR /app
-
-RUN pip3 install -r requirements.txt --no-cache-dir
 
 CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000"]
