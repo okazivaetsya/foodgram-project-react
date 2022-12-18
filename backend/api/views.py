@@ -3,9 +3,11 @@ import io
 from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-
+from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
+                            Recipes, ShoppingCart, Tags)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -13,16 +15,14 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from users.models import CustomUser, Follow
-from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
-                            Recipes, ShoppingCart, Tags)
 
-from .services import get_ingredients_list
 from .filters import IngredientsFilter, RecipeFilter
 from .pagination import FoodgramPagination
-from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipePostSerializer, RecipeSerializer,
-                          FavoriteSerializer, TagsSerializer,
-                          UserSerializer, SimpleRecipeSerializer)
+from .serializers import (FavoriteSerializer, FollowSerializer,
+                          IngredientSerializer, RecipePostSerializer,
+                          RecipeSerializer, SimpleRecipeSerializer,
+                          TagsSerializer, UserSerializer)
+from .services import get_ingredients_list
 
 
 class TagsViewSet(viewsets.ModelViewSet):

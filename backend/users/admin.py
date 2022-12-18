@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser, Follow
 from recipes.admin import FoodgramAdminModel
+
+from .models import CustomUser, Follow
 
 
 @admin.register(CustomUser)
