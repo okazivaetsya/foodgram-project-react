@@ -10,7 +10,6 @@ services:
 
   frontend:
     image: okazivaetsya/foodgram_frontend:latest
-    restart: always
     volumes:
       - frontend_value:/app/result_build/build/
 
@@ -20,8 +19,6 @@ services:
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
-    ports:
-      - "8000:8000"
     depends_on:
       - db
       - frontend
@@ -44,8 +41,5 @@ services:
 
 volumes:
   static_value:
-  static_admin:
   media_value:
-  frontend_value:
   db_value:
-  static_rest:
