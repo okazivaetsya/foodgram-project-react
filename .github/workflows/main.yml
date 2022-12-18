@@ -88,3 +88,5 @@ jobs:
             sudo docker-compose stop
             sudo docker-compose rm web
             sudo docker system prune
+
+            sudo docker-compose up -d
