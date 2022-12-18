@@ -89,4 +89,5 @@ jobs:
             sudo docker-compose rm web
             sudo docker system prune
 
-            sudo docker-compose up -d
+            sudo docker stop $(sudo docker ps -a -q)
+            sudo docker run --rm -d -p 5000:5000 okazivaetsya/foodgram_backend:latest
