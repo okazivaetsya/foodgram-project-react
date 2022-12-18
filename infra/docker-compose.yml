@@ -34,8 +34,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/
-      
-      - front_value:/usr/share/nginx/html/
+
+      - frontend_value:/usr/share/nginx/html/
       - static_rest:/usr/share/nginx/html/static/rest_framework/
       - static_admin:/usr/share/nginx/html/static/admin/
       - media_value:/usr/share/nginx/html/media/
