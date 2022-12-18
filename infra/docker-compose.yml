@@ -33,7 +33,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
       - frontend_value:/usr/share/nginx/html/
       - static_rest:/usr/share/nginx/html/static/rest_framework/
@@ -49,3 +49,4 @@ volumes:
   media_value:
   frontend_value:
   db_value:
+  static_rest:
