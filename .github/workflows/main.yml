@@ -3,7 +3,7 @@ name: foodgram workflow
 on: [push]
 
 jobs:
-  setup PIP and dependencies:
+  setup_PIP_and_dependencies:
     runs-on: ubuntu-latest
 
     steps:
