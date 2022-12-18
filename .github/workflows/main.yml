@@ -37,7 +37,7 @@ jobs:
           uses: docker/build-push-action@v2
           with:
             push: true
-            context: ./
+            context: ./backend
             tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
     
   build_frontend_and_push_to_docker_hub:
@@ -82,7 +82,8 @@ jobs:
             sudo docker pull mamasidikova/foodgram_backend
             
             sudo docker-compose stop
-            sudo docker-compose rm web
+            sudo docker-compose rm foodgram_backend
+            sudo docker-compose rm foodgram_frontend
             sudo docker system prune
             
             touch .env 

@@ -45,6 +45,7 @@ services:
 
 volumes:
   static_value:
+  static_admin:
   media_value:
   frontend_value:
   db_value:
