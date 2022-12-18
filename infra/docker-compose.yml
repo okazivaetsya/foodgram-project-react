@@ -18,7 +18,7 @@ services:
       - ../frontend/:/app/result_build/
 
   backend:
-    image: 26remph/food_back:latest
+    image: okazivaetsya/foodgram_backend:latest
     restart: always
     volumes:
       - static_rest:/app/static/rest_framework/
