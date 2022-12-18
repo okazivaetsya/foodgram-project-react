@@ -1,4 +1,4 @@
-name: yamdb_workflow (sprint 16)
+name: foodgram v1.0
 
 on: [push]
 
