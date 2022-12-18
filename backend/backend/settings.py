@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'default_key')
 
-DEBUG = bool(os.getenv('DEBUG_STATUS'))
+DEBUG = bool(os.getenv('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = ["*", "localhost"]
 
