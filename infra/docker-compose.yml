@@ -2,30 +2,30 @@ version: '3.3'
 services:
   db:
     image: postgres:13.0-alpine
-    volumes:
-      - /var/lib/postgresql/data/
-    env_file:
-      - .env
-
-  web:
-    image: okazivaetsya/foodgram_backend:latest
     restart: always
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
+      - db_value:/var/lib/postgresql/data/
     env_file:
       - .env
 
   frontend:
     image: okazivaetsya/foodgram_frontend:latest
+    restart: always
     volumes:
-      - ../frontend/:/app/result_build/
+      - frontend_value:/app/result_build/build/
+
+  backend:
+    image: okazivaetsya/foodgram_backend:latest
+    restart: always
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
+
     depends_on:
-      - web
+      - db
+      - frontend
+    env_file:
+      - .env
 
   nginx:
     image: nginx:1.19.3
@@ -38,9 +38,11 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - web
+      - backend
       - frontend
+
 volumes:
-  postgres_data:
   static_value:
   media_value:
+  frontend_value:
+  db_value:
