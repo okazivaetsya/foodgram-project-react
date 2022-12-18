@@ -25,7 +25,7 @@ def create_pdf(data, file_name='shopping_list.pdf'):
     start_y = 800 # начало строки по оси Y
     for string_line in shoping_list:
         p.drawString(start_x, start_y, string_line)
-        start_y -= 15
+        start_y -= 15 # для переходуа на другую строку смещаем курсор по оси Y на 15
     p.showPage()
     p.save()
     buffer.seek(0)
