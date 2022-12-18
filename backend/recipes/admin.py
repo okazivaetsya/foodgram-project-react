@@ -47,8 +47,13 @@ class RecipesAdmin(FoodgramAdminModel):
     list_display = (
         'id', 'name',
         'image', 'cooking_time',
-        'text', 'pub_date',
+        'text', 'pub_date', 'favorites_count'
     )
+
+    def favorites_count(self, obj):
+        return obj.favorites.all().count()
+
+    favorites_count.short_description = "кол-во добавлений в избранное"
 
 
 @admin.register(Favorites)
