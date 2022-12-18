@@ -6,7 +6,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 
-def create_pdf(data, file_name='shopping_list.pdf'):
+def create_pdf(data, file_name):
     shoping_list = []
     shoping_list.append('СПИСОК ПОКУПОК:')
     shoping_list.append('---------')
@@ -28,7 +28,7 @@ def create_pdf(data, file_name='shopping_list.pdf'):
         start_y -= 15 # для переходуа на другую строку смещаем курсор по оси Y на 15
     p.showPage()
     p.save()
-    buffer.seek(0)
+    buffer.seek(0) # значение 0 для перемещения курсора в начало
     return FileResponse(
         buffer, as_attachment=True,
         filename=file_name

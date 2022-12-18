@@ -1,8 +1,11 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from drf_writable_nested import WritableNestedModelSerializer
-from recipes.models import (Favorites, Ingredients, IngredientsInRecipes,
-                            Recipes, ShoppingCart, Tags, TagsInRecipes)
+
+from recipes.models import (
+    Favorites, Ingredients, IngredientsInRecipes,
+    Recipes, ShoppingCart, Tags, TagsInRecipes
+)
 from rest_framework import serializers
 from users.models import CustomUser, Follow
 from users.utils import check_user_items_in_models
@@ -177,7 +180,7 @@ class RecipePostSerializer(
             text=text,
             cooking_time=cooking_time,
         )
-        return self.add_tags_and_ingredients_to_recipe(
+        return self.__add_tags_and_ingredients_to_recipe(
             tags, ingredients, recipe
         )
 
@@ -186,7 +189,7 @@ class RecipePostSerializer(
         ingredients = validated_data.pop('ingredients_in_recipes')
         TagsInRecipes.objects.filter(recipe=instance).delete()
         IngredientsInRecipes.objects.filter(recipe=instance).delete()
-        instance = self.add_tags_and_ingredients_to_recipe(
+        instance = self.__add_tags_and_ingredients_to_recipe(
             tags, ingredients, instance)
         super().update(instance, validated_data)
         instance.save()

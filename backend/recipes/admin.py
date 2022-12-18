@@ -1,7 +1,9 @@
 from django.contrib import admin
 
-from .models import (Favorites, Ingredients, IngredientsInRecipes, Recipes,
-                     ShoppingCart, Tags, TagsInRecipes)
+from .models import (
+    Favorites, Ingredients, IngredientsInRecipes, Recipes,
+    ShoppingCart, Tags, TagsInRecipes
+)
 
 
 class FoodgramAdminModel(admin.ModelAdmin):
@@ -53,7 +55,7 @@ class RecipesAdmin(FoodgramAdminModel):
     def favorites_count(self, obj):
         return obj.favorites.all().count()
 
-    favorites_count.short_description = "кол-во добавлений в избранное"
+    favorites_count.short_description = 'кол-во добавлений в избранное'
 
 
 @admin.register(Favorites)

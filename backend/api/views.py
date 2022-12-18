@@ -2,15 +2,16 @@ from django.db.models import Sum
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from users.models import CustomUser, Follow
+from backend.settings import SHOPPING_LIST_FILE_NAME
 from recipes.models import (
     Favorites, Ingredients, IngredientsInRecipes,
     Recipes, ShoppingCart, Tags
 )
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from users.models import CustomUser, Follow
-
 from .filters import IngredientsFilter, RecipeFilter
 from .pagination import FoodgramPagination
 from .serializers import (
@@ -95,7 +96,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).annotate(
             sum_amount=Sum('amount')
         )
-        return create_pdf(ingredients, 'new_shopping_list.pdf')
+        return create_pdf(ingredients, SHOPPING_LIST_FILE_NAME)
+
 
 class IngredientsViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с ингредиентами"""

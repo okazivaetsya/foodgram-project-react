@@ -141,3 +141,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+SHOPPING_LIST_FILE_NAME = 'shopping_list.pdf'
