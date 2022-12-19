@@ -13,14 +13,12 @@ services:
     volumes:
       - ../frontend/:/app/result_build/
 
-  web:
+  backend:
     image: okazivaetsya/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
-    ports:
-      - "8000:8000"
     depends_on:
       - db
       - frontend
