@@ -13,7 +13,7 @@ services:
     volumes:
       - ../frontend/:/app/result_build/
 
-  backend:
+  web:
     image: okazivaetsya/foodgram_backend:latest
     restart: always
     volumes:
@@ -36,7 +36,7 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - backend
+      - web
       - frontend
 
 volumes:
