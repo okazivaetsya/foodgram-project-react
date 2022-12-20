@@ -156,7 +156,7 @@ class IngredientsInRecipes(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f'{self.recipe}: {self.ingredient}'
+        return f'{self.recipe}: {self.ingredient} - {self.amount}'
 
 
 class Favorites(models.Model):
