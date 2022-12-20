@@ -1,17 +1,13 @@
-# from dotenv import find_dotenv, load_dotenv
-import environ
+from dotenv import find_dotenv, load_dotenv
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+load_dotenv(find_dotenv())
 
-# load_dotenv(find_dotenv())
+DEBUG = False
 
-DEBUG = env('DEBUG')
-
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 ALLOWED_HOSTS = ['*','158.160.11.184','localhost']
 
@@ -95,12 +91,12 @@ DJOSER = {
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': env('DB_NAME'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT')
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT')
     }
 }
 
