@@ -82,8 +82,6 @@ jobs:
             sudo docker pull okazivaetsya/foodgram_backend
             
             sudo docker-compose stop
-            sudo docker-compose rm foodgram_backend
-            sudo docker-compose rm foodgram_frontend
             sudo docker system prune
             
             rm .env
