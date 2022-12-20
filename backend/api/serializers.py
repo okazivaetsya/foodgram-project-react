@@ -274,12 +274,12 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """метод достает рецепты с учетом query параметра recipes_limit"""
         request = self.context.get('request')
-        recipes_limit = int(request.GET.get('recipes_limit'))
+        recipes_limit = request.GET.get('recipes_limit')
         queryset = Recipes.objects.filter(
                 author__id=obj.id).order_by('id')
         if recipes_limit:
             return SimpleRecipeSerializer(
-                queryset[:recipes_limit], many=True
+                queryset[:int(recipes_limit)], many=True
             ).data
         return SimpleRecipeSerializer(queryset, many=True).data
 
