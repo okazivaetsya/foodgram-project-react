@@ -27,7 +27,7 @@ class RecipeFilter(filters.FilterSet):
 
 class IngredientsFilter(filters.rest_framework.FilterSet):
     """Фильтр для ингредиентов"""
-    name = filters.rest_framework.CharFilter(lookup_expr='istartswith')
+    name = filters.rest_framework.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Ingredients
