@@ -7,7 +7,7 @@ load_dotenv(find_dotenv())
 
 DEBUG = False
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY','1^5wfgy&x8o68voje9(*rer0qz(8w)85hgqmz!^w6#%^jy+f21')
 
 ALLOWED_HOSTS = ['*','158.160.11.184','localhost']
 
