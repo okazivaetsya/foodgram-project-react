@@ -9,9 +9,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # load_dotenv(find_dotenv())
 
-SECRET_KEY = env('SECRET_KEY')
-
 DEBUG = env('DEBUG')
+
+SECRET_KEY = env('SECRET_KEY')
 
 ALLOWED_HOSTS = ['*','158.160.11.184','localhost']
 
