@@ -47,7 +47,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return RecipePostSerializer
 
     @staticmethod
-    def _add_recipe_to(self, request, pk, model, my_serializer):
+    def _add_recipe_to(request, pk, model, my_serializer):
         recipe_id = pk
         if request.method == 'POST':
             recipe = get_object_or_404(Recipes, id=recipe_id)
