@@ -1,3 +1,4 @@
+from email.policy import default
 import os
 
 from dotenv import find_dotenv, load_dotenv
@@ -8,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'default_key')
 
-DEBUG = eval(os.getenv('DJANGO_DEBUG'))
+DEBUG = eval(os.getenv('DJANGO_DEBUG'), default=False)
 
 ALLOWED_HOSTS = ['*','158.160.11.184','localhost']
 
