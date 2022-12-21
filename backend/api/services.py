@@ -1,12 +1,13 @@
 import io
 
+from django.conf import settings
 from django.http import FileResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 
-def create_pdf(data, file_name):
+def create_pdf(data):
     shoping_list = []
     shoping_list.append('СПИСОК ПОКУПОК:')
     shoping_list.append('---------')
@@ -31,5 +32,5 @@ def create_pdf(data, file_name):
     buffer.seek(0) # значение 0 для перемещения курсора в начало
     return FileResponse(
         buffer, as_attachment=True,
-        filename=file_name
+        filename=settings.SHOPPING_LIST_FILE_NAME
     )

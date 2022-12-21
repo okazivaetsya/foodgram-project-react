@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db.models import Sum
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -98,7 +97,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).annotate(
             sum_amount=Sum('amount')
         )
-        return create_pdf(ingredients, settings.SHOPPING_LIST_FILE_NAME)
+        return create_pdf(ingredients)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):

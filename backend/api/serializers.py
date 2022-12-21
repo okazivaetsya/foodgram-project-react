@@ -1,12 +1,12 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from drf_writable_nested import WritableNestedModelSerializer
+from rest_framework import serializers
 
 from recipes.models import (
     Favorites, Ingredients, IngredientsInRecipes,
     Recipes, ShoppingCart, Tags, TagsInRecipes
 )
-from rest_framework import serializers
 from users.models import CustomUser, Follow
 from users.utils import check_user_items_in_models
 
