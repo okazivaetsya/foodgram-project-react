@@ -25,7 +25,7 @@ Foodgram - проект для создания, хранения и просм�
 scp docker-compose.yml <user_name>@<ip>:
 scp nginx.conf <user_name>@<ip>:/nginx/default.conf
 ```
-3) Запустите docer-compose:
+3) Запустите docker-compose:
 ```bash 
 sudo docker-compose up -d --build
 ```
